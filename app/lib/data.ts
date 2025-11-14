@@ -9,7 +9,17 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const connectionString = process.env.POSTGRES_URL;
+
+if (!connectionString) {
+  throw new Error('POSTGRES_URL environment variable is not set.');
+}
+
+const isLocalHost = /localhost|127\.0\.0\.1/.test(connectionString);
+
+const sql = postgres(connectionString, {
+  ssl: isLocalHost ? false : 'require',
+});
 
 export async function fetchRevenue() {
   try {
